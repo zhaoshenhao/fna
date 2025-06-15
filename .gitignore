@@ -1,0 +1,118 @@
+build/fna_app/.env
+build/run.sh
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Distributions and packaging
+dist/
+build/
+*.egg
+*.whl
+*.mo
+*.pot
+*.log
+.coverage
+.tox/
+.nox/
+
+# Virtual environment
+# Common names for virtual environment directories
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Dependencies (if you're not using pip freeze or specific dependency locking)
+# usually these are handled by pip freeze / poetry.lock / pipenv.lock
+# but in some cases you might still want to ignore a specific package
+# pip-wheel-cache/
+# .Python
+# develop-eggs/
+# eggs/
+
+# Editors and IDEs
+# VS Code
+.vscode/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Atom
+.atom/
+# IntelliJ / PyCharm / Webstorm etc.
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.metadata
+.classpath
+.settings/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.bak
+*.swp
+*~
+._*
+
+# Miscellaneous files
+# Jupyter Notebooks
+.ipynb_checkpoints/
+# MyPy cache
+.mypy_cache/
+.dmypy.json
+.dmypy.bld
+# Black formatter cache
+.black/
+
+# Database files (e.g., SQLite databases)
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+logs/
+
+# Uploads or downloaded files
+uploads/
+downloads/
+
+# Configuration files that may contain sensitive information
+# It's better to use environment variables for sensitive info,
+# but if you must use files, keep them out of version control.
+.env
+.flaskenv
+instance/
+config.ini
+config.json
+*.ini
+*.json
+*.yaml
+*.yml
+
+# Large data files (if not managed by Git LFS)
+*.csv
+*.txt
+*.parquet
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# Docker
+# Don't ignore .dockerignore itself!
+# .dockerignore
+# Docker volumes usually live outside the repo, but if they are mounted inside
+# you might want to ignore them if they contain dynamic data.
+# However, for your current
