@@ -1,0 +1,17 @@
+bs4
+googletrans
+PyYAML
+lxml_html_clean
+playwright
+beautifulsoup4
+scrapy
+selenium
+undetected-chromedriver
+libretranslatepy
+django
+psycopg2-binary
+feedparser
+django-unfold
+google-generativeai
+python-decouple
+groq
