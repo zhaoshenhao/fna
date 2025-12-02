@@ -2,15 +2,19 @@
 import requests
 from abc import ABC, abstractmethod
 import logging
+from django.conf import settings
+import google.generativeai as genai
+from groq import Groq
+from webui.agent.utils import gemini_gen, groq_gen
+
+
 logger = logging.getLogger(__name__)
 
 class Analyzer(ABC):
     """
     Base class for all AI models, defining a consistent interface for news analysis.
     """
-    def __init__(self, model_name: str, api_base_url: str):
-        self.model_name = model_name
-        self.api_base_url = api_base_url
+    def __init__(self):
         self.headers = {"Content-Type": "application/json"}
 
     @abstractmethod
@@ -28,14 +32,7 @@ class Analyzer(ABC):
         """
         pass
 
-class OllamaAnalyzer(Analyzer):
-    """
-    Subclass for interacting with a locally running Ollama model.
-    """
-    def __init__(self, model_name: str = "qwen:7b-chat", api_base_url: str = "http://localhost:11434/api/generate"):
-        super().__init__(model_name, api_base_url)
-
-    def _generate_prompt(self, news_title: str, news_content: str) -> str:
+    def generate_prompt(self, news_title: str, news_content: str) -> str:
         """
         Generates the detailed prompt for the Ollama model with the revised format.
         """
@@ -83,12 +80,41 @@ class OllamaAnalyzer(Analyzer):
         新闻文章内容：{news_content}
         """
         return prompt.strip()
+    
+
+class GeminiAnalyzer(Analyzer):
+    def __init__(self):
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.model = genai.GenerativeModel(settings.GEMINI_TRANS_MODEL)
+    
+    def analyze_news_impact(self, news_title: str, news_content: str) -> str:
+        return gemini_gen(self.model, self.generate_prompt(news_title, news_content))
+        
+
+class GroqAnalyzer(Analyzer):
+    def __init__(self):
+        self.client = Groq(api_key=settings.GROQ_API_KEY)
+        self.model = settings.GROQ_TRANS_MODEL
+    
+    def analyze_news_impact(self, news_title: str, news_content: str) -> str:
+        return groq_gen(self.client, self.model, self.generate_prompt(news_title, news_content))
+    
+    
+class OllamaAnalyzer(Analyzer):
+    """
+    Subclass for interacting with a locally running Ollama model.
+    """
+    def __init__(self):
+        self.model_name = settings.OLLAMA_ANALYZER_MODEL
+        self.api_base_url = settings.OLLAMA_URL
+        super().__init__()
+
 
     def analyze_news_impact(self, news_title: str, news_content: str) -> str: # Return type changed to str
         """
         Analyzes news impact using the Ollama model, returning the full text response.
         """
-        prompt = self._generate_prompt(news_title, news_content)
+        prompt = self.generate_prompt(news_title, news_content)
         data = {
             "model": self.model_name,
             "prompt": prompt,
@@ -114,4 +140,8 @@ class OllamaAnalyzer(Analyzer):
 def get_analyzer(analyzer_name: str):
     if analyzer_name == "ollama":
         return OllamaAnalyzer()
-    raise Exception(f"Unsupported model: {analyzer_name}")
+    if analyzer_name == "gemini":
+        return GeminiAnalyzer()
+    if analyzer_name == "groq":
+        return GroqAnalyzer()
+    raise Exception(f"Unsupported analyzer: {analyzer_name}")

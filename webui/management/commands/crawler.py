@@ -6,6 +6,14 @@ from webui.agent.run import Pipeline
 
 class Command(BaseCommand):
     help = 'Populates the NewsArticles with data from a source.'
+    
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--workers',
+            type=int,
+            help='Optional: Sync data for a specific user ID.',
+            default=2,
+        )
 
     # You can add arguments if your command needs them
     # def add_arguments(self, parser):
@@ -13,9 +21,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('Starting data population...'))
+        workers = options['workers']
 
         try:
-            p = Pipeline(workers=5)
+            p = Pipeline(workers=workers)
             p.run()
             self.stdout.write(self.style.SUCCESS('Data population finished successfully.'))
         except Exception as e:

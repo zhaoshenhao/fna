@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from datetime import datetime
 import logging
+import re
 logger = logging.getLogger(__name__)
 
 # ===== Base class and Yahoo implementation =====
@@ -100,7 +101,9 @@ class YahooFinanceScraper(BaseRSSScraper):
         for p in soup.select(".body p"):
             text = p.get_text(strip=True)
             if text:
-                content_blocks.append(text)
+                new_text = re.sub("Sign in to access your portfolio", "", text, flags=re.IGNORECASE)
+                if new_text and new_text.strip():
+                    content_blocks.append(new_text)
         content = "\n".join(content_blocks)
         return {
             "url": url,
@@ -117,7 +120,9 @@ class YahooFinanceScraper(BaseRSSScraper):
             page = browser.new_page()
             try:
                 page.goto(url, timeout=30000, wait_until="domcontentloaded")
-                page.wait_for_selector('#nimbus-app > section > section > section > article', timeout=30000)
+                #page.wait_for_selector('#nimbus-app > section > section > section > article', timeout=30000)
+                page.wait_for_load_state('domcontentloaded', timeout=60000)
+                #page.wait_for_selector('main > section > section > section > section > article', timeout=60000)
                 html = page.content()
                 return self.extract_article_content(html, url)
             except Exception as e:

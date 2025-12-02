@@ -53,9 +53,15 @@ class Pipeline:
         # Extract Content
         logger.info("Extract content...")
         a2 = self.rss_scraper.extract_article(article['link'])
+        keys_to_check = ['content', 'author', 'title', 'url', 'published']
         if not a2:
-            logger.warnning(f"Warning: Failed to extract content for '{article['title']}'. Skipping analysis.")
+            logger.warnning(f"WARNING: Failed to extract content for '{article['title']}'. Skipping analysis.")
             return
+        if not all(key in a2 for key in keys_to_check):
+            logger.warning(f"WARNING: Failed to extract content for '{article['title']}'. Not all keys available Skipping analysis.")
+            logger.debug(a2)
+            return
+        logger.debug(a2)
         content = a2['content']
         author = a2['author']
         title = a2['title']
@@ -65,6 +71,8 @@ class Pipeline:
         logger.info("Translating article content to Chinese...")
         translated_content = self.translator.translate_text(content)
         translated_title = self.translator.translate_text(title)
+        logger.debug(translated_content)
+        logger.debug(translated_title)
         if not translated_content:
             logger.warnning(f"Warning: Failed to translate content for '{title}'. Skipping analysis.")
             return
@@ -94,6 +102,8 @@ class Pipeline:
                     translated_content = translated_content,
                     created_at = now(),
                     author = author,
+                    translator = settings.TRANSLATOR,
+                    analyzer = settings.ANALYZER,
                 )
                 try:
                     a.save()

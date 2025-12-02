@@ -20,6 +20,8 @@ class NewsArticles(models.Model):
     result = models.TextField()
     translated_content = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
+    translator = models.CharField(blank=True, null=True, max_length=50)
+    analyzer = models.CharField(blank=True, null=True, max_length=50)
 
     class Meta:
         managed = False
