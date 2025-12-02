@@ -8,6 +8,9 @@ import asyncio
 import sys
 import re
 from django.conf import settings
+from webui.agent.utils import gemini_gen, groq_gen
+import google.generativeai as genai
+from groq import Groq
 
 
 logger = logging.getLogger(__name__)
@@ -22,10 +25,35 @@ class BaseTranslator:
         pass
 
 
-class OllamaTranslator(BaseTranslator):
-    def __init__(self, host="http://localhost:11434", model="qwen3:8b"):
-        self.host = host
-        self.model = model
+class GenAITranslator(BaseTranslator):
+    def get_prompt(self, text: str) -> str:
+        pstr = f"将以下英文准确的翻译成简体中文，不要添加额外内容：\n{text}"
+        logger.debug(f"Prompt: {pstr}")
+        return pstr
+
+
+class GroqTranslator(GenAITranslator):
+    def __init__(self):
+        self.client = Groq(api_key=settings.GROQ_API_KEY)
+        self.model = settings.GROQ_TRANS_MODEL
+    
+    def translate_text(self, text: str) -> str:
+        return groq_gen(self.client, self.model, self.get_prompt(text))
+
+
+class GeminiTranslator(GenAITranslator):
+    def __init__(self):
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.model = genai.GenerativeModel(settings.GEMINI_TRANS_MODEL)
+    
+    def translate_text(self, text: str) -> str:
+        return gemini_gen(self.model, self.get_prompt(text))
+    
+
+class OllamaTranslator(GenAITranslator):
+    def __init__(self):
+        self.host = settings.OLLAMA_URL
+        self.model = settings.OLLAMA_TRANS_MODEL
         self.pattern = r"<think>(.*?)</think>"
 
     def remove_think_tag(self, text: str) -> str:
@@ -33,13 +61,12 @@ class OllamaTranslator(BaseTranslator):
         
         
     def translate_text(self, text: str) -> str:
-        prompt = f"请将以下英文翻译成简体中文：\n{text}"
         payload = {
             "model": self.model,
-            "prompt": prompt,
+            "prompt": self.get_prompt(text),
             "stream": True
         }
-        response = requests.post(f"{self.host}/api/generate", headers=headers, data=json.dumps(payload), stream=True, timeout=120)
+        response = requests.post(self.host, headers=headers, data=json.dumps(payload), stream=True, timeout=120)
         response.raise_for_status()
         translated_chunks = []
         for line in response.iter_lines():
@@ -79,17 +106,25 @@ class GoogleTranslator(BaseTranslator):
     
 
 def get_translator(translator_name: str):
+    logger.debug(f'Translator: {translator_name}')
     if translator_name == "ollama":
-        return OllamaTranslator("http://172.30.237.34:11434", model=settings.OLLAMA_MODEL)
+        return OllamaTranslator()
     elif translator_name == "libre":
         return LibreTranslator()
     elif translator_name == "google":
         return GoogleTranslator()
+    elif translator_name == "gemini":
+        return GeminiTranslator()
+    elif translator_name == "groq":
+        return GroqTranslator()
     else:
         raise Exception(f"[!] Unsupported translator: {translator_name}")
 
 
 def main():
+    import sys
+    from os.path import dirname
+    sys.path.append("/home/allen/work/fna")
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(dest="command")
     test_parser = subparsers.add_parser("test", help="测试翻译器")

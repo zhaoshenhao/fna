@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g_85k7nta3tupg5+_*%_usem%h50ve=ww+7n9-jr_@=i+cs=s&'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'localhost',
+    '168.231.66.109',
+    '0.0.0.0',
+    'compusky.com',
+    'www.compusky.com',
+]
 
 # Application definition
 
@@ -83,9 +89,9 @@ WSGI_APPLICATION = 'fna.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fna',        # Your database name
-        'USER': 'fna',        # Your PostgreSQL username
-        'PASSWORD': 'fna_password',  # Your PostgreSQL password
+        'NAME': config('DB_NAME'),        # Your database name
+        'USER': config('DB_USER'),        # Your PostgreSQL username
+        'PASSWORD': config('DB_PASSWORD'),  # Your PostgreSQL password
         'HOST': 'localhost',             # Or your DB host IP/domain
         'PORT': '5432',                  # Default PostgreSQL port
     }
@@ -115,13 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/Toronto'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -134,22 +136,68 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RSS_SCRAPER = "yahoo"
-TRANSLATOR = "ollama"
-ANALYZER = "ollama"
-OLLAMA_MODEL = "qwen3:8b"
+TRANSLATOR = "groq"
+ANALYZER = "groq"
+
+OLLAMA_URL="http://localhost:11434/api/generate"
+OLLAMA_TRANS_MODEL = "qwen3:8b"
+OLLAMA_ANALYZER_MODEL = "qwen3:8b"
+
+GEMINI_API_KEY = config('GEMINI_API_KEY')
+GEMINI_TRANS_MODEL = "gemini-2.5-flash"
+GEMINI_ANALYZER_MODEL = "gemini-2.5-flash"
+
+GROQ_API_KEY = config('GROQ_API_KEY')
+#GROQ_TRANS_MODEL = "meta-llama/llama-guard-4-12b"
+#GROQ_ANALYZER_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
+GROQ_TRANS_MODEL = "llama-3.1-8b-instant"
+GROQ_ANALYZER_MODEL = "llama-3.1-8b-instant"
+
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'crawler': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'crawler.log',
+            'formatter': 'verbose'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'crawler': {
+            'handlers': ['crawler', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
     },
 }

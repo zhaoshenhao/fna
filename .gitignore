@@ -1,5 +1,8 @@
 build/fna_app/.env
 build/run.sh
+nohup.out
+pfwd.bat
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
@@ -116,3 +119,6 @@ config.json
 # Docker volumes usually live outside the repo, but if they are mounted inside
 # you might want to ignore them if they contain dynamic data.
 # However, for your current
+webui/test2.py
+webui/tests.py
+fna.sh
