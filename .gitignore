@@ -122,3 +122,5 @@ config.json
 webui/test2.py
 webui/tests.py
 fna.sh
+start.sh
+webui/tests.py
