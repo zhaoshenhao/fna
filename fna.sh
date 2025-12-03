@@ -16,7 +16,7 @@ start() {
     source activate base
     conda activate fna
     export PYTHONPATH=$(pwd):$(pwd)/fna:$(pwd)/webui
-    nohup gunicorn --workers=2 fna.wsgi &
+    nohup gunicorn --workers=2 --bind 0.0.0.0:8200 fna.wsgi &
   else
     echo "You are not ${SERVICE_USER}."
   fi
