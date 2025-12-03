@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    #path('webui/', include('webui.urls')),
+    path('fna/', admin.site.urls),
+    #path('fna/', include('webui.urls')),
 ]
 
