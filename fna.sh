@@ -8,12 +8,12 @@
 SERVICE_NAME="FNA Web"
 SERVICE_USER="compusky"
 WORK_DIR="/home/compusky/fna"
-export PYTHONPATH=${WORK_DIR}:${WORK_DIR}/fna:${WORK_DIR}/web
+export PYTHONPATH=${WORK_DIR}:${WORK_DIR}/fna:${WORK_DIR}/webui
 
 start() {
   if [[ `/usr/bin/whoami` == $SERVICE_USER ]]; then
     cd "${WORK_DIR}"
-    conda init
+    source activate base
     conda activate fna
     export PYTHONPATH=$(pwd):$(pwd)/fna:$(pwd)/webui
     nohup gunicorn --workers=2 fna.wsgi &
