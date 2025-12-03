@@ -28,7 +28,7 @@ stop() {
 }
 
 status() {
-  echo "Running process: $( pidof /home/compusky/miniconda3/envs/fna/bin/python )"
+  echo "Running process: $( pidof /home/compusky/miniconda3/envs/fna/bin/python3.12 )"
 }
 
 #Body main
