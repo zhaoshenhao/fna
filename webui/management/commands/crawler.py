@@ -12,7 +12,7 @@ class Command(BaseCommand):
             '--workers',
             type=int,
             help='Optional: Sync data for a specific user ID.',
-            default=2,
+            default=1,
         )
 
     # You can add arguments if your command needs them
