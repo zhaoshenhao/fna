@@ -24,7 +24,7 @@ start() {
 
 stop() {
   cd $FOLDER
-  kill -s TERM $( pidof /home/compusky/miniconda3/envs/fna/bin/python )
+  kill -s TERM $( pidof /home/compusky/miniconda3/envs/fna/bin/python3.12 )
 }
 
 status() {
