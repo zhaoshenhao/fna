@@ -27,7 +27,7 @@ class BaseTranslator:
 
 class GenAITranslator(BaseTranslator):
     def get_prompt(self, text: str) -> str:
-        pstr = f"将以下英文准确的翻译成简体中文，不要添加额外内容：\n{text}"
+        pstr = f"你是一个金融、经济、股票中英文翻译专家。将以下英文准确的翻译成简体中文，不要添加额外内容：\n{text}"
         logger.debug(f"Prompt: {pstr}")
         return pstr
 
